@@ -1,2 +1,0 @@
-# CodePulse Test Repo
-test
