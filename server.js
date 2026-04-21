@@ -3,9 +3,12 @@ const express = require('express');
 const sqlite3 = require('sqlite3');
 const fs = require('fs');
 
-// Drift / Bad Architecture: Mixing require() at the top with an import statement here.
+// Drift / Bad Architecture: Dynamic import mixed with require inside a weird IIFE
 // (This will drive static analysis tools crazy when mixed with CommonJS).
-import path from 'path';
+let pathModule;
+(async () => {
+    pathModule = await import('path');
+})();
 
 // Vulnerability: Hardcoded Secrets at the top of the file
 const JWT_SECRET = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.super_secret_jwt_key_12345!";
@@ -132,6 +135,7 @@ app.post('/api/process', (req, res) => {
 // Vulnerability: Unrestricted File Read / Path Traversal
 // e.g. GET /api/download?file=../../../../etc/passwd
 app.get('/api/download', (req, res) => {
+    const path = require('path'); // Drift: requiring inside a route handler
     const filePath = req.query.file;
     // No sanitization of filePath
     const fullPath = path.join(__dirname, filePath);
