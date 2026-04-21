@@ -151,3 +151,14 @@ app.get('/api/download', (req, res) => {
 app.listen(3000, () => {
     console.log("Messy server running on port 3000");
 });
+
+// Dead Code: Unused Class
+class DeadClass {
+    constructor() {
+        this.unusedProp = "I do nothing";
+    }
+    
+    deadMethod() {
+        return this.unusedProp;
+    }
+}
