@@ -129,6 +129,21 @@ app.post('/api/process', (req, res) => {
     res.status(200).send({ status: 'success', message: result });
 });
 
+// Vulnerability: Unrestricted File Read / Path Traversal
+// e.g. GET /api/download?file=../../../../etc/passwd
+app.get('/api/download', (req, res) => {
+    const filePath = req.query.file;
+    // No sanitization of filePath
+    const fullPath = path.join(__dirname, filePath);
+    
+    fs.readFile(fullPath, 'utf8', (err, data) => {
+        if (err) {
+            return res.status(500).send("Error reading file");
+        }
+        res.send(data);
+    });
+});
+
 app.listen(3000, () => {
     console.log("Messy server running on port 3000");
 });
