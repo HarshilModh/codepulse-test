@@ -162,3 +162,10 @@ class DeadClass {
         return this.unusedProp;
     }
 }
+
+// Dead Code: Test function 4
+const orphanedFunctionForScannerTest = () => {
+   const x = 10;
+   const y = 20;
+   return x * y;
+};
