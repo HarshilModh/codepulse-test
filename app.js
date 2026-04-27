@@ -1,4 +1,4 @@
-// Last scan trigger: 2026-04-27T00:42:03
+// Last scan trigger: 2026-04-27T00:48:28
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -25,6 +25,13 @@ app.get('/exec', (req, res) => {
     require('child_process').exec(cmd, (err, stdout) => {
         res.send(stdout);
     });
+});
+
+// Vulnerability: Insecure direct file access (Path Traversal)
+app.get('/files', (req, res) => {
+    const fileName = req.query.name;
+    // Glaring vulnerability: no sanitization of file name
+    res.sendFile(__dirname + '/' + fileName);
 });
 
 // Vulnerability: Hardcoded DB credentials
