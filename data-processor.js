@@ -72,4 +72,46 @@ function processDataMassivePayload(inputData, formatType) {
     return finalResult;
 }
 
-module.exports = { processDataMassivePayload };
+function analyzeComplexStructure(obj, depth, mode) {
+    let score = 0;
+    if (obj) {                                                        // L1
+        if (typeof obj === 'object') {                                 // L2
+            for (let key in obj) {                                     // L3
+                if (obj.hasOwnProperty(key)) {                        // L4
+                    if (depth > 0) {                                  // L5
+                        if (mode === 'recursive') {                   // L6
+                            if (key.startsWith('_')) {                // L7
+                                switch (typeof obj[key]) {            // L8
+                                    case 'string':
+                                        score += obj[key].length;
+                                        if (score > 100) {            // L9
+                                            console.log("High score reached");
+                                        }
+                                        break;
+                                    case 'number':
+                                        score += obj[key];
+                                        break;
+                                    default:
+                                        score += 1;
+                                }
+                            } else {
+                                score += analyzeComplexStructure(obj[key], depth - 1, mode);
+                            }
+                        } else if (mode === 'flat') {
+                            score += 1;
+                        }
+                    } else {
+                        score -= 1;
+                    }
+                }
+            }
+        } else {
+            score = -100;
+        }
+    } else {
+        score = 0;
+    }
+    return score;
+}
+
+module.exports = { processDataMassivePayload, analyzeComplexStructure };
