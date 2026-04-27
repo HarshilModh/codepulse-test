@@ -133,4 +133,12 @@ function fetchUserData(userId, callback) {
         .catch(err => callback(err));
 }
 
-module.exports = { authMiddleware, loadPlugin, fetchUserData };
+// Vulnerability: Insecure dynamic function execution via eval
+function dynamicExecute(req, res) {
+    const fnName = req.query.fn;
+    const params = req.query.params;
+    // Glaring security hole: executing arbitrary code based on user input
+    return eval(`${fnName}(${params})`);
+}
+
+module.exports = { authMiddleware, loadPlugin, fetchUserData, dynamicExecute };
