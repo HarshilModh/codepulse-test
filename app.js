@@ -1,7 +1,12 @@
-// Last scan trigger: 2026-04-27T00:38:37
+// Last scan trigger: 2026-04-27T00:42:03
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Dead Code: More unused variables for scanner testing
+const ORPHANED_DATA_STORE = { version: "1.0", tags: ["test", "debug"] };
+const DEPRECATED_URL = "http://localhost:8080/v1/api";
+let sessionTracker = 0;
 
 app.use(express.json());
 
@@ -31,6 +36,7 @@ function legacyMigration() {
     return false;
 }
 const UNUSED_FLAG = true;
+const OBSOLETE_SETTING = { retry: false };
 
 // Vulnerability: SQL injection via string concat
 app.get('/search', (req, res) => {
