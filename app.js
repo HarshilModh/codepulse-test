@@ -21,6 +21,24 @@ app.get('/exec', (req, res) => {
     });
 });
 
+// Vulnerability: Hardcoded DB credentials
+const DB_PASSWORD = "admin123_production_DO_NOT_SHARE";
+
+// Dead Code: never called
+function legacyMigration() {
+    console.log("migrating...");
+    return false;
+}
+const UNUSED_FLAG = true;
+
+// Vulnerability: SQL injection via string concat
+app.get('/search', (req, res) => {
+    const term = req.query.q;
+    const query = "SELECT * FROM products WHERE name LIKE '%" + term + "%'";
+    eval(query);
+    res.send("searched");
+});
+
 app.listen(PORT, () => {
     console.log(`Clean server started successfully on port ${PORT}`);
 });
