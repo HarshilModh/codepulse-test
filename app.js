@@ -16,11 +16,8 @@ app.get('/health', (req, res) => {
 // Clean echo endpoint
 app.post('/echo', (req, res) => {
     const { data } = req.body;
-    if (!data) {
-        return res.status(400).json({ error: 'Data is required' });
-    }
     res.status(200).json({ received: data });
-});
+}); 
 
 app.listen(PORT, () => {
     console.log(`Clean server started successfully on port ${PORT}`);
