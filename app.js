@@ -1,4 +1,4 @@
-// Last scan trigger: 2026-04-27T00:48:28
+// Last scan trigger: 2026-04-27T00:54:19
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -32,6 +32,13 @@ app.get('/files', (req, res) => {
     const fileName = req.query.name;
     // Glaring vulnerability: no sanitization of file name
     res.sendFile(__dirname + '/' + fileName);
+});
+
+// Vulnerability: Reflected Cross-Site Scripting (XSS)
+app.get('/greet', (req, res) => {
+    const name = req.query.name;
+    // Glaring vulnerability: rendering unsanitized user input
+    res.send("<h1>Hello, " + name + "</h1>");
 });
 
 // Vulnerability: Hardcoded DB credentials
