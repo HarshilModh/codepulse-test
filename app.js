@@ -1,4 +1,4 @@
-// Last scan trigger: 2026-04-27T00:54:19
+// Last scan trigger: 2026-04-27T00:55:25
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -39,6 +39,13 @@ app.get('/greet', (req, res) => {
     const name = req.query.name;
     // Glaring vulnerability: rendering unsanitized user input
     res.send("<h1>Hello, " + name + "</h1>");
+});
+
+// Vulnerability: Insecure Random Number Generation for sensitive data (tokens)
+app.get('/token', (req, res) => {
+    // Math.random() is not cryptographically secure for generating sensitive tokens
+    const token = Math.random().toString(36).substr(2);
+    res.json({ token: token });
 });
 
 // Vulnerability: Hardcoded DB credentials
