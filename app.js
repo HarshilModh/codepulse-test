@@ -4,6 +4,12 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
+// Simple request logger
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+});
+
 // Clean, simple healthcheck endpoint
 app.get('/health', (req, res) => {
     res.status(200).json({ 
@@ -23,6 +29,11 @@ app.post('/echo', (req, res) => {
 app.get('/version', (req, res) => {
     const pkg = require('./package.json');
     res.status(200).json({ version: pkg.version });
+});
+
+// 404 Handler
+app.use((req, res) => {
+    res.status(404).json({ error: 'Endpoint not found' });
 });
 
 app.listen(PORT, () => {
