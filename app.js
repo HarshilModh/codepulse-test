@@ -31,6 +31,17 @@ app.get('/version', (req, res) => {
     res.status(200).json({ version: pkg.version });
 });
 
+// Stats endpoint
+app.get('/stats', (req, res) => {
+    res.status(200).json({
+        uptime: process.uptime(),
+        memory: process.memoryUsage(),
+        platform: process.platform,
+        arch: process.arch,
+        nodeVersion: process.version
+    });
+});
+
 // 404 Handler
 app.use((req, res) => {
     res.status(404).json({ error: 'Endpoint not found' });
