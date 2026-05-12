@@ -19,6 +19,12 @@ app.post('/echo', (req, res) => {
     res.status(200).json({ received: data });
 }); 
 
+// Version endpoint
+app.get('/version', (req, res) => {
+    const pkg = require('./package.json');
+    res.status(200).json({ version: pkg.version });
+});
+
 app.listen(PORT, () => {
     console.log(`Clean server started successfully on port ${PORT}`);
 });
