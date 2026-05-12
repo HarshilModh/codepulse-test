@@ -42,6 +42,11 @@ app.get('/stats', (req, res) => {
     });
 });
 
+// Ping endpoint
+app.get('/ping', (req, res) => {
+    res.status(200).send('pong');
+});
+
 // 404 Handler
 app.use((req, res) => {
     res.status(404).json({ error: 'Endpoint not found' });
