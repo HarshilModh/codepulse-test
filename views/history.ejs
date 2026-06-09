@@ -1,0 +1,176 @@
+<%- include('partials/header') %>
+
+<div class="history-container">
+    <div class="card glass">
+        <div class="card-header flex-row-between">
+            <h3><i data-lucide="history" class="header-icon text-indigo"></i> Historical Scan Reports</h3>
+            <button id="btn-clear-history" class="btn btn-danger btn-sm <%= scans.length === 0 ? 'hidden' : '' %>">
+                <i data-lucide="trash-2"></i> Clear History
+            </button>
+        </div>
+        <div class="card-body">
+            <% if (scans.length === 0) { %>
+                <div class="text-center text-muted py-5" id="history-empty-message">
+                    <i data-lucide="inbox" class="large-icon mb-2"></i>
+                    <p>No scan history found. Run workspace scans or snippets scan to generate reports.</p>
+                </div>
+            <% } else { %>
+                <div class="history-list" id="history-list">
+                    <% scans.forEach((scan, index) => { %>
+                        <div class="history-item glass" id="scan-item-<%= scan.id %>">
+                            <!-- Header / Accordion Trigger -->
+                            <div class="history-item-header flex-row-between" onclick="toggleScanDetail('<%= scan.id %>')">
+                                <div class="item-meta flex-row-align">
+                                    <span class="badge <%= scan.type === 'workspace' ? 'bg-indigo' : 'bg-cyan' %> mr-2">
+                                        <%= scan.type.toUpperCase() %>
+                                    </span>
+                                    <span class="item-title font-bold"><code><%= scan.target %></code></span>
+                                    <span class="item-date text-muted ml-3"><%= new Date(scan.timestamp).toLocaleString() %></span>
+                                </div>
+                                <div class="item-results flex-row-align">
+                                    <span class="badge <%= scan.metrics.grade === 'A' || scan.metrics.grade === 'B' ? 'bg-success' : 'bg-warning' %> mr-3">
+                                        Grade <%= scan.metrics.grade %> (<%= scan.metrics.score %>%)
+                                    </span>
+                                    <span class="<%= scan.vulnerabilities.length > 0 ? 'text-rose font-bold' : 'text-success' %> mr-3">
+                                        <%= scan.vulnerabilities.length %> issues
+                                    </span>
+                                    <i data-lucide="chevron-down" class="chevron-icon" id="chevron-<%= scan.id %>"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- Detailed Findings (Collapsible Content) -->
+                            <div class="history-item-details hidden" id="details-<%= scan.id %>">
+                                <div class="details-divider"></div>
+                                <div class="details-metrics-grid">
+                                    <div class="sub-metric">
+                                        <span>Total Lines</span>
+                                        <strong><%= scan.metrics.totalLines %></strong>
+                                    </div>
+                                    <div class="sub-metric">
+                                        <span>Code Lines</span>
+                                        <strong><%= scan.metrics.codeLines %></strong>
+                                    </div>
+                                    <div class="sub-metric">
+                                        <span>Complexity</span>
+                                        <strong><%= scan.metrics.complexity %></strong>
+                                    </div>
+                                    <div class="sub-metric">
+                                        <span>Files Scanned</span>
+                                        <strong><%= scan.type === 'workspace' && scan.files ? scan.files.length : 1 %></strong>
+                                    </div>
+                                </div>
+
+                                <!-- Vulnerabilities Detail List -->
+                                <div class="details-vulnerabilities mt-4">
+                                    <h4 class="mb-2">Detected Security Vulnerabilities (<%= scan.vulnerabilities.length %>)</h4>
+                                    <% if (scan.vulnerabilities.length === 0) { %>
+                                        <div class="alert alert-success">
+                                            <i data-lucide="check-circle"></i> Clean scan! No security vulnerabilities identified.
+                                        </div>
+                                    <% } else { %>
+                                        <div class="vulns-list-box">
+                                            <% scan.vulnerabilities.forEach(v => { %>
+                                                <div class="vuln-detail-item border-<%= v.severity.toLowerCase() %>">
+                                                    <div class="vuln-detail-header flex-row-between">
+                                                        <span class="vuln-name font-bold"><%= v.name %></span>
+                                                        <span class="badge bg-<%= v.severity.toLowerCase() %>"><%= v.severity %></span>
+                                                    </div>
+                                                    <div class="vuln-meta text-muted text-sm">
+                                                        File: <code><%= v.file %></code> &bull; Line: <%= v.line %>
+                                                    </div>
+                                                    <p class="vuln-desc text-sm mt-2"><%= v.description %></p>
+                                                    <div class="vuln-code-snippet mt-2">
+                                                        <code><%= v.code %></code>
+                                                    </div>
+                                                    <div class="vuln-remediation text-sm mt-2">
+                                                        <strong>Remediation:</strong> <%= v.remediation %>
+                                                    </div>
+                                                </div>
+                                            <% }); %>
+                                        </div>
+                                    <% } %>
+                                </div>
+
+                                <!-- Scanned Files (Workspace Only) -->
+                                <% if (scan.type === 'workspace' && scan.files && scan.files.length > 0) { %>
+                                    <div class="details-files mt-4">
+                                        <h4 class="mb-2">Scanned Source Files (<%= scan.files.length %>)</h4>
+                                        <table class="data-table data-table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>File Path</th>
+                                                    <th>Lines of Code</th>
+                                                    <th>Score / Grade</th>
+                                                    <th>Issues</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% scan.files.forEach(f => { %>
+                                                    <tr>
+                                                        <td><code><%= f.file %></code></td>
+                                                        <td><%= f.metrics.codeLines %></td>
+                                                        <td>
+                                                            <span class="badge <%= f.metrics.grade === 'A' || f.metrics.grade === 'B' ? 'bg-success' : 'bg-warning' %>">
+                                                                <%= f.metrics.grade %> (<%= f.metrics.score %>%)
+                                                            </span>
+                                                        </td>
+                                                        <td class="<%= f.vulnerabilitiesCount > 0 ? 'text-rose font-bold' : 'text-success' %>">
+                                                            <%= f.vulnerabilitiesCount %>
+                                                        </td>
+                                                    </tr>
+                                                <% }); %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Handle Accordion Toggling
+    function toggleScanDetail(id) {
+        const detailsEl = document.getElementById('details-' + id);
+        const chevronEl = document.getElementById('chevron-' + id);
+        const itemEl = document.getElementById('scan-item-' + id);
+        
+        if (detailsEl.classList.contains('hidden')) {
+            detailsEl.classList.remove('hidden');
+            itemEl.classList.add('active');
+            chevronEl.style.transform = 'rotate(180deg)';
+        } else {
+            detailsEl.classList.add('hidden');
+            itemEl.classList.remove('active');
+            chevronEl.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    // Clear history handler
+    const clearBtn = document.getElementById('btn-clear-history');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', async () => {
+            if (!confirm('Are you sure you want to clear all scan history? This action is irreversible.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/scans', { method: 'DELETE' });
+                const res = await response.json();
+                if (res.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + res.error);
+                }
+            } catch (err) {
+                alert('Network error trying to clear history');
+            }
+        });
+    }
+</script>
+
+<%- include('partials/footer') %>

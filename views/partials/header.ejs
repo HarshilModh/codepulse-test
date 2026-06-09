@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    
+    <!-- Premium Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <i data-lucide="activity"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>CodePulse</h1>
+                    <span>Security Engine</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="<%= title.startsWith('Dashboard') ? 'active' : '' %>">
+                        <a href="/">
+                            <i data-lucide="layout-dashboard"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="<%= title.startsWith('Interactive') ? 'active' : '' %>">
+                        <a href="/scan">
+                            <i data-lucide="shield-alert"></i>
+                            <span>Scan Code</span>
+                        </a>
+                    </li>
+                    <li class="<%= title.startsWith('Scan Log') ? 'active' : '' %>">
+                        <a href="/history">
+                            <i data-lucide="history"></i>
+                            <span>Scan History</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="footer-status">
+                    <span class="status-indicator online"></span>
+                    <span class="status-text">Server Online</span>
+                </div>
+                <div class="footer-version">v1.0.0</div>
+            </div>
+        </aside>
+
+        <!-- Main Content Wrapper -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="top-bar-title">
+                    <h2><%= title.split(' - ')[0] %></h2>
+                </div>
+                <div class="top-bar-actions">
+                    <div class="system-time" id="system-time">--:--:--</div>
+                </div>
+            </header>
+            
+            <div class="content-body">

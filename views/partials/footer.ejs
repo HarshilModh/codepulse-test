@@ -1,0 +1,22 @@
+            </div> <!-- End content-body -->
+        </main> <!-- End main-content -->
+    </div> <!-- End app-container -->
+
+    <!-- Global App Scripts -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Update system clock dynamically in the top bar
+        function updateClock() {
+            const timeEl = document.getElementById('system-time');
+            if (timeEl) {
+                const now = new Date();
+                timeEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            }
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+</body>
+</html>
