@@ -106,6 +106,16 @@ const RULES = [
             return /\b\.(?:find|findOne|update|updateOne|updateMany|delete|deleteOne|deleteMany)\s*\(\s*\{.*?\b(req\.(?:query|params|body))\b/i.test(line) &&
                    !/\b(?:sanitize|String)\b/i.test(line);
         }
+    },
+    {
+        id: 'WEAK_CRYPTO',
+        name: 'Insecure Hashing Algorithm',
+        severity: 'MEDIUM',
+        description: 'MD5 and SHA-1 hashing algorithms are cryptographically broken, vulnerable to collision attacks, and must not be used for hashing passwords or verifying data integrity in security contexts.',
+        remediation: 'Upgrade to a secure hashing function such as SHA-256 or SHA-512 (via crypto.createHash), or use password-specific hashing functions like bcrypt or argon2.',
+        test: (line) => {
+            return /\bcreateHash\s*\(\s*['"](?:md5|sha1)['"]\s*\)/i.test(line);
+        }
     }
 ];
 

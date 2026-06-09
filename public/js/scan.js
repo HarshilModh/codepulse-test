@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (presetVal === 'sql') filenameInput.value = 'db-query.js';
                 else if (presetVal === 'xss') filenameInput.value = 'name-renderer.js';
                 else if (presetVal === 'nosql') filenameInput.value = 'user-auth.js';
+                else if (presetVal === 'crypto') filenameInput.value = 'hasher.js';
                 else filenameInput.value = 'vulnerable-server.js';
             }
         });

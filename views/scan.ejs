@@ -15,6 +15,7 @@
                     <option value="sql">SQL Injection Vulnerability</option>
                     <option value="xss">Reflected XSS Vulnerability</option>
                     <option value="nosql">NoSQL Injection Vulnerability</option>
+                    <option value="crypto">Weak Hashing Algorithm</option>
                     <option value="mixed">All Security Flaws (mixed)</option>
                 </select>
             </div>
@@ -166,6 +167,13 @@ function loginUser(req, res) {
         if (user) res.send("Authenticated!");
         else res.status(401).send("Failed!");
     });
+}`,
+        crypto: `// Medium: Insecure Hashing Algorithm (MD5)
+const crypto = require('crypto');
+
+function hashPassword(password) {
+    // Vulnerable: MD5 is cryptographically broken and prone to collision attacks
+    return crypto.createHash('md5').update(password).digest('hex');
 }`,
         mixed: `const fs = require('fs');
 const { execSync } = require('child_process');
