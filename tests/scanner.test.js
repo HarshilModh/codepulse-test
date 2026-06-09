@@ -123,4 +123,15 @@ describe('Static Security Scanner Unit Tests', () => {
         expect(nosqlVuln).toBeDefined();
         expect(nosqlVuln.severity).toBe('HIGH');
     });
+
+    test('should detect Weak Crypto vulnerability', () => {
+        const vulnCode = `
+            const hash = crypto.createHash('md5').update('pass').digest('hex');
+        `;
+        const report = scanner.scanSnippet(vulnCode, 'crypto.js');
+        expect(report.vulnerabilities.length).toBe(1);
+        const cryptoVuln = report.vulnerabilities.find(v => v.ruleId === 'WEAK_CRYPTO');
+        expect(cryptoVuln).toBeDefined();
+        expect(cryptoVuln.severity).toBe('MEDIUM');
+    });
 });
