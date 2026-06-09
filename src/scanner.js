@@ -138,6 +138,16 @@ const RULES = [
             return /\bcors\s*\(\s*\{\s*origin\s*:\s*['"]\*['"]\s*\}\s*\)/i.test(line) ||
                    /Access-Control-Allow-Origin\b.*['"]\*['"]/i.test(line);
         }
+    },
+    {
+        id: 'HARDCODED_CONN_STRING',
+        name: 'Hardcoded Connection String',
+        severity: 'HIGH',
+        description: 'Hardcoded database connection strings containing credentials expose usernames and passwords to anyone with repository access.',
+        remediation: 'Load database connection strings from environment variables (process.env) instead of hardcoding them.',
+        test: (line) => {
+            return /(mongodb(?:\+srv)?|postgres|mysql|sqlite):\/\/[a-zA-Z0-9_]+:[^@\s]+@[a-zA-Z0-9_\-\.]+/i.test(line);
+        }
     }
 ];
 
