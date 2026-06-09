@@ -97,4 +97,17 @@ describe('Static Security Scanner Unit Tests', () => {
         expect(sqlVuln).toBeDefined();
         expect(sqlVuln.severity).toBe('HIGH');
     });
+
+    test('should detect XSS vulnerability', () => {
+        const vulnCode = `
+            app.get('/test', (req, res) => {
+                res.send("Hello " + req.query.name);
+            });
+        `;
+        const report = scanner.scanSnippet(vulnCode, 'xss.js');
+        expect(report.vulnerabilities.length).toBe(1);
+        const xssVuln = report.vulnerabilities.find(v => v.ruleId === 'XSS');
+        expect(xssVuln).toBeDefined();
+        expect(xssVuln.severity).toBe('HIGH');
+    });
 });

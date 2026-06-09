@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (presetVal === 'cmd') filenameInput.value = 'pinger.js';
                 else if (presetVal === 'secret') filenameInput.value = 'payment.js';
                 else if (presetVal === 'sql') filenameInput.value = 'db-query.js';
+                else if (presetVal === 'xss') filenameInput.value = 'name-renderer.js';
                 else filenameInput.value = 'vulnerable-server.js';
             }
         });

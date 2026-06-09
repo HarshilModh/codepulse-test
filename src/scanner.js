@@ -77,6 +77,24 @@ const RULES = [
             return /\b(db|sqlite|conn|connection|pg|client|mysql)\.(query|execute)\s*\(\s*([^)'"`]+|['"`].*?[\+\$].*?['"`])\s*[,)]/i.test(line) &&
                    !/\b(?:bind|params|values|\[.*\])\b/i.test(line);
         }
+    },
+    {
+        id: 'XSS',
+        name: 'Reflected Cross-Site Scripting (XSS)',
+        severity: 'HIGH',
+        description: 'Reflected XSS occurs when user-provided input is reflected back to the client directly in the response without sanitization or HTML encoding.',
+        remediation: 'Escape all user inputs before rendering them, use secure EJS escape tags (<%= %> instead of <%- %>), or use sanitization libraries like dompurify.',
+        test: (line) => {
+            const match = /\bres\.(?:send|write)\s*\((.+)\)/i.exec(line);
+            if (!match) return false;
+            const args = match[1].trim();
+            if (/req\.(?:query|params|body|headers)/.test(line)) {
+                if (args.includes('+') || args.includes('`') || !/^(?:'[^']*'|"[^"]*")$/.test(args)) {
+                    return !/\b(?:escape|sanitize|clean|encodeURIComponent)\b/i.test(line);
+                }
+            }
+            return false;
+        }
     }
 ];
 
