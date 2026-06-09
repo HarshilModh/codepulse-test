@@ -12,6 +12,7 @@
                     <option value="eval">Unsafe Dynamic Evaluation (eval)</option>
                     <option value="cmd">OS Command Injection (exec)</option>
                     <option value="secret">Hardcoded API Secret Keys</option>
+                    <option value="sql">SQL Injection Vulnerability</option>
                     <option value="mixed">All Security Flaws (mixed)</option>
                 </select>
             </div>
@@ -129,6 +130,18 @@ function pay(amount) {
     console.log("Processing payment for amount: " + amount);
     // Key used below
     return { status: "success", gateway: "stripe", key: STRIPE_SECRET };
+}`,
+        sql: `// High: SQL Injection Vulnerability via direct parameter interpolation
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database(':memory:');
+
+function getUserProfile(userId, callback) {
+    // Attackers can manipulate query by entering: 1' OR '1'='1
+    const query = "SELECT * FROM users WHERE id = '" + userId + "'";
+    
+    db.query(query, (err, rows) => {
+        callback(err, rows);
+    });
 }`,
         mixed: `const fs = require('fs');
 const { execSync } = require('child_process');

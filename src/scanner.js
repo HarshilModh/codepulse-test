@@ -65,6 +65,18 @@ const RULES = [
             return /\bfs\.(?:readFile|readFileSync|createReadStream|writeFile|writeFileSync)\s*\(\s*([^)'"`]+|['"`].*?[\+\$].*?['"`])\s*[,)]/i.test(line) &&
                    !/\bpath\.(join|resolve|basename)\b/.test(line);
         }
+    },
+    {
+        id: 'SQL_INJECTION',
+        name: 'SQL Injection Vulnerability',
+        severity: 'HIGH',
+        description: 'Constructing SQL queries directly using string concatenation or template literal variables allows attackers to inject malicious database commands.',
+        remediation: 'Use parameterized queries/prepared statements (e.g. using placeholder ? or $1), or use an ORM (like Prisma or Sequelize).',
+        test: (line) => {
+            // Detect queries using template literals with interpolation or string concatenation
+            return /\b(db|sqlite|conn|connection|pg|client|mysql)\.(query|execute)\s*\(\s*([^)'"`]+|['"`].*?[\+\$].*?['"`])\s*[,)]/i.test(line) &&
+                   !/\b(?:bind|params|values|\[.*\])\b/i.test(line);
+        }
     }
 ];
 

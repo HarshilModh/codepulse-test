@@ -83,4 +83,18 @@ describe('Static Security Scanner Unit Tests', () => {
         expect(pathVuln).toBeDefined();
         expect(pathVuln.severity).toBe('HIGH');
     });
+
+    test('should detect SQL Injection vulnerability', () => {
+        const vulnCode = `
+            const query = "SELECT * FROM users WHERE username = '" + username + "'";
+            db.query(query, (err, rows) => {
+                console.log(rows);
+            });
+        `;
+        const report = scanner.scanSnippet(vulnCode, 'sql.js');
+        expect(report.vulnerabilities.length).toBe(1);
+        const sqlVuln = report.vulnerabilities.find(v => v.ruleId === 'SQL_INJECTION');
+        expect(sqlVuln).toBeDefined();
+        expect(sqlVuln.severity).toBe('HIGH');
+    });
 });
