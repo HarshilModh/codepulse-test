@@ -13,6 +13,7 @@
                     <option value="cmd">OS Command Injection (exec)</option>
                     <option value="secret">Hardcoded API Secret Keys</option>
                     <option value="sql">SQL Injection Vulnerability</option>
+                    <option value="xss">Reflected XSS Vulnerability</option>
                     <option value="mixed">All Security Flaws (mixed)</option>
                 </select>
             </div>
@@ -143,6 +144,15 @@ function getUserProfile(userId, callback) {
         callback(err, rows);
     });
 }`,
+        xss: `// High: Reflected Cross-Site Scripting (XSS)
+const express = require('express');
+const app = express();
+
+app.get('/welcome', (req, res) => {
+    const name = req.query.name || 'Guest';
+    // Vulnerable: reflecting user input directly without HTML encoding
+    res.send("<h1>Hello " + name + "</h1>");
+});`,
         mixed: `const fs = require('fs');
 const { execSync } = require('child_process');
 
