@@ -93,3 +93,4 @@ A full-stack static code quality and security analysis application. CodePulse sc
 - `GET /version` - Package version info
 - `GET /stats` - Raw execution stats
 - `GET /ping` - Response "pong"
+test
