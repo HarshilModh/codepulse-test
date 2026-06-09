@@ -16,6 +16,7 @@
                     <option value="xss">Reflected XSS Vulnerability</option>
                     <option value="nosql">NoSQL Injection Vulnerability</option>
                     <option value="crypto">Weak Hashing Algorithm</option>
+                    <option value="cors">Insecure CORS Configuration</option>
                     <option value="mixed">All Security Flaws (mixed)</option>
                 </select>
             </div>
@@ -175,6 +176,18 @@ function hashPassword(password) {
     // Vulnerable: MD5 is cryptographically broken and prone to collision attacks
     return crypto.createHash('md5').update(password).digest('hex');
 }`,
+        cors: `// High: Wildcard CORS configuration
+const express = require('express');
+const cors = require('cors');
+const app = express();
+
+// Vulnerable: allowing all origins can lead to CSRF-like data leaks
+app.use(cors({ origin: '*' }));
+
+app.get('/data', (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.json({ secret: 'user_sensitive_data' });
+});`,
         mixed: `const fs = require('fs');
 const { execSync } = require('child_process');
 

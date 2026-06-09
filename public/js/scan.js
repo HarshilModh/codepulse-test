@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (presetVal === 'xss') filenameInput.value = 'name-renderer.js';
                 else if (presetVal === 'nosql') filenameInput.value = 'user-auth.js';
                 else if (presetVal === 'crypto') filenameInput.value = 'hasher.js';
+                else if (presetVal === 'cors') filenameInput.value = 'cors-config.js';
                 else filenameInput.value = 'vulnerable-server.js';
             }
         });

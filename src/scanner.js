@@ -127,6 +127,17 @@ const RULES = [
             return /\.innerHTML\s*=\s*(?:[^)'"`\s]+|['"`].*?[\+\$].*?['"`])/i.test(line) &&
                    !/\b(?:sanitize|escape|DOMPurify|textContent|innerText)\b/i.test(line);
         }
+    },
+    {
+        id: 'INSECURE_CORS',
+        name: 'Insecure CORS Configuration',
+        severity: 'HIGH',
+        description: 'Enabling wildcard (*) origins or reflecting arbitrary origins in Cross-Origin Resource Sharing (CORS) configurations allows malicious sites to access sensitive session resources.',
+        remediation: 'Specify a list of explicit, trusted source domains in the origin configuration instead of using wildcard or reflecting requests blindly.',
+        test: (line) => {
+            return /\bcors\s*\(\s*\{\s*origin\s*:\s*['"]\*['"]\s*\}\s*\)/i.test(line) ||
+                   /Access-Control-Allow-Origin\b.*['"]\*['"]/i.test(line);
+        }
     }
 ];
 
