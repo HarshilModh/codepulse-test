@@ -1,0 +1,175 @@
+<%- include('partials/header') %>
+
+<div class="sandbox-container">
+    <div class="card glass">
+        <div class="card-header flex-row-between">
+            <h3><i data-lucide="shield-alert" class="header-icon text-rose"></i> Code Security Playground</h3>
+            <div class="sandbox-presets">
+                <label for="presets-select" class="presets-label">Preset Examples:</label>
+                <select id="presets-select" class="form-control select-preset">
+                    <option value="">-- Choose a Preset --</option>
+                    <option value="safe">Clean / Safe Code</option>
+                    <option value="eval">Unsafe Dynamic Evaluation (eval)</option>
+                    <option value="cmd">OS Command Injection (exec)</option>
+                    <option value="secret">Hardcoded API Secret Keys</option>
+                    <option value="sql">SQL Injection Vulnerability</option>
+                    <option value="mixed">All Security Flaws (mixed)</option>
+                </select>
+            </div>
+        </div>
+        <div class="card-body">
+            <form id="snippet-scan-form">
+                <div class="form-group">
+                    <label for="sandbox-code">JavaScript Code</label>
+                    <textarea id="sandbox-code" class="code-editor" rows="12" placeholder="// Paste your javascript code here..."></textarea>
+                </div>
+                <div class="flex-row-between">
+                    <div class="form-group flex-1 mr-2">
+                        <label for="sandbox-filename">Virtual Filename</label>
+                        <input type="text" id="sandbox-filename" class="form-control" value="playground.js" placeholder="playground.js">
+                    </div>
+                    <div class="form-actions mt-auto">
+                        <button type="submit" id="btn-scan-snippet" class="btn btn-primary">
+                            <i data-lucide="zap"></i> Run Security Scan
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scan Results Card (Initially Hidden) -->
+    <div id="scan-results-card" class="card glass hidden">
+        <div class="card-header flex-row-between">
+            <h3><i data-lucide="check-circle" class="header-icon text-success"></i> Scan Findings</h3>
+            <span class="badge" id="results-grade">Grade A</span>
+        </div>
+        <div class="card-body">
+            <div class="results-summary-grid">
+                <div class="summary-metric">
+                    <span class="label">Security Score</span>
+                    <span class="value" id="results-score">100%</span>
+                </div>
+                <div class="summary-metric">
+                    <span class="label">Total Lines</span>
+                    <span class="value" id="results-lines">0</span>
+                </div>
+                <div class="summary-metric">
+                    <span class="label">Vulnerabilities</span>
+                    <span class="value text-rose" id="results-vulns-count">0</span>
+                </div>
+                <div class="summary-metric">
+                    <span class="label">Est. Complexity</span>
+                    <span class="value" id="results-complexity">1</span>
+                </div>
+            </div>
+
+            <!-- Vulnerability Detail List -->
+            <div class="vulnerabilities-section">
+                <h4>Detected Issues</h4>
+                <div id="vulnerabilities-list" class="vulnerabilities-list">
+                    <!-- Dynamic Items will go here -->
+                </div>
+            </div>
+
+            <!-- Highlighted Source View -->
+            <div class="source-code-section mt-4">
+                <h4>Code Review (Line Highlights)</h4>
+                <div class="code-viewer-wrapper">
+                    <pre class="code-viewer" id="code-highlights-view"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Presets Data Container -->
+<script>
+    const PRESETS = {
+        safe: `const express = require('express');
+const app = express();
+
+// A safe and clean endpoint
+app.get('/user/:id', (req, res) => {
+    const userId = parseInt(req.params.id, 10);
+    if (isNaN(userId)) {
+        return res.status(400).send('Invalid user ID');
+    }
+    
+    console.log("Safe logging for ID: " + userId);
+    res.json({ id: userId, name: "User " + userId });
+});`,
+        eval: `// Critical: Unsafe evaluation using eval
+function parseCookie(cookieStr) {
+    let result = {};
+    try {
+        // Attackers can exploit eval to execute server-side code
+        result = eval('(' + cookieStr + ')');
+    } catch(err) {
+        console.error("Failed to parse");
+    }
+    return result;
+}`,
+        cmd: `const { exec } = require('child_process');
+
+// RCE Vulnerability: direct input concatenation into exec
+function pingServer(ipAddress) {
+    exec("ping -c 3 " + ipAddress, (error, stdout, stderr) => {
+        if (error) {
+            console.error(\`error: \${error.message}\`);
+            return;
+        }
+        console.log(\`output: \${stdout}\`);
+    });
+}`,
+        secret: `// High: Hardcoded authentication details
+const STRIPE_SECRET = "sk_test_51M001B93FJJ18L9P2K399120ASDF";
+const PAYPAL_TOKEN = "PPL_TOKEN_UNENCRYPTED_902183921_ABC";
+
+function pay(amount) {
+    console.log("Processing payment for amount: " + amount);
+    // Key used below
+    return { status: "success", gateway: "stripe", key: STRIPE_SECRET };
+}`,
+        sql: `// High: SQL Injection Vulnerability via direct parameter interpolation
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database(':memory:');
+
+function getUserProfile(userId, callback) {
+    // Attackers can manipulate query by entering: 1' OR '1'='1
+    const query = "SELECT * FROM users WHERE id = '" + userId + "'";
+    
+    db.query(query, (err, rows) => {
+        callback(err, rows);
+    });
+}`,
+        mixed: `const fs = require('fs');
+const { execSync } = require('child_process');
+
+// Preset with multiple vulnerability categories
+const JWT_SECRET_KEY = "super_secret_signing_key_123456";
+
+function handler(req, res) {
+    const filename = req.query.file;
+    const command = req.query.cmd;
+    
+    // Path Traversal
+    const fileContent = fs.readFileSync(filename, 'utf8'); 
+    
+    // OS Command Injection
+    const result = execSync("echo " + command);
+    
+    // Insecure Random Generation
+    const token = Math.random().toString(36);
+    
+    // Unsafe Eval
+    const payload = eval(req.query.json);
+    
+    res.send({ fileContent, result, token, payload });
+}`
+    };
+</script>
+
+<script src="/js/scan.js"></script>
+
+<%- include('partials/footer') %>

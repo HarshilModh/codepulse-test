@@ -1,0 +1,178 @@
+<%- include('partials/header') %>
+
+<div class="dashboard-grid">
+    <!-- Stat Cards Row -->
+    <div class="stat-card glass flex-row-between">
+        <div class="stat-info">
+            <span class="stat-label">Total Scans</span>
+            <span class="stat-value" id="stat-total-scans"><%= stats.totalScans %></span>
+        </div>
+        <div class="stat-icon bg-indigo">
+            <i data-lucide="scan"></i>
+        </div>
+    </div>
+    
+    <div class="stat-card glass flex-row-between">
+        <div class="stat-info">
+            <span class="stat-label">Vulnerabilities Found</span>
+            <span class="stat-value text-rose" id="stat-total-vulns"><%= stats.totalVulnerabilitiesFound %></span>
+        </div>
+        <div class="stat-icon bg-rose">
+            <i data-lucide="alert-triangle"></i>
+        </div>
+    </div>
+    
+    <div class="stat-card glass flex-row-between">
+        <div class="stat-info">
+            <span class="stat-label">Latest Grade</span>
+            <span class="stat-value <%= stats.latestGrade === 'A' || stats.latestGrade === 'B' ? 'text-cyan' : 'text-amber' %>" id="stat-latest-grade">
+                <%= stats.latestGrade %>
+            </span>
+        </div>
+        <div class="stat-icon bg-cyan">
+            <i data-lucide="award"></i>
+        </div>
+    </div>
+    
+    <div class="stat-card glass flex-row-between">
+        <div class="stat-info">
+            <span class="stat-label">Workspace Score</span>
+            <span class="stat-value" id="stat-latest-score"><%= stats.latestScore %>%</span>
+        </div>
+        <div class="stat-icon bg-amber">
+            <i data-lucide="shield"></i>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-row">
+    <!-- Real-time Metrics Card -->
+    <div class="card glass flex-2">
+        <div class="card-header">
+            <h3><i data-lucide="activity" class="header-icon text-cyan"></i> Real-time System Metrics</h3>
+            <span class="badge badge-live">Live SSE</span>
+        </div>
+        <div class="card-body">
+            <div class="metrics-grid">
+                <div class="metric-progress-container">
+                    <div class="metric-progress-header">
+                        <span>CPU Usage</span>
+                        <span id="live-cpu-val">0%</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar bg-cyan" id="live-cpu-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="metric-progress-container">
+                    <div class="metric-progress-header">
+                        <span>Memory Heap (Used / Total)</span>
+                        <span id="live-mem-val">0MB / 0MB</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar bg-indigo" id="live-mem-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="realtimeChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions Card -->
+    <div class="card glass flex-1">
+        <div class="card-header">
+            <h3><i data-lucide="sliders" class="header-icon text-indigo"></i> Quick Controls</h3>
+        </div>
+        <div class="card-body controls-body">
+            <button id="btn-scan-workspace" class="btn btn-primary btn-block">
+                <i data-lucide="folder-search"></i> Scan Local Workspace
+            </button>
+            <a href="/scan" class="btn btn-secondary btn-block">
+                <i data-lucide="code-2"></i> Open Code Sandbox
+            </a>
+            
+            <div class="workspace-info-box">
+                <h4>Workspace Details</h4>
+                <p><strong>Path:</strong> <code>codepulse-test/</code></p>
+                <p><strong>App Version:</strong> v<%= version %></p>
+                <p><strong>Node.js Version:</strong> <span id="node-ver"><%= process.version %></span></p>
+                <p><strong>Server Uptime:</strong> <span id="uptime-val">0s</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Scans Section -->
+<div class="card glass">
+    <div class="card-header flex-row-between">
+        <h3><i data-lucide="clock" class="header-icon text-amber"></i> Recent Scans</h3>
+        <a href="/history" class="btn btn-link">View All History <i data-lucide="arrow-right"></i></a>
+    </div>
+    <div class="card-body table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Scan Type</th>
+                    <th>Target Spec</th>
+                    <th>Grade</th>
+                    <th>Health Score</th>
+                    <th>Vulnerabilities</th>
+                    <th>Execution Time</th>
+                </tr>
+            </thead>
+            <tbody id="recent-scans-tbody">
+                <% if (recentScans.length === 0) { %>
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">No scans run yet. Run a scan above to populate database.</td>
+                    </tr>
+                <% } else { %>
+                    <% recentScans.forEach(scan => { %>
+                        <tr>
+                            <td>
+                                <span class="badge <%= scan.type === 'workspace' ? 'bg-indigo' : 'bg-cyan' %>">
+                                    <%= scan.type.toUpperCase() %>
+                                </span>
+                            </td>
+                            <td><code><%= scan.target %></code></td>
+                            <td>
+                                <span class="badge <%= scan.metrics.grade === 'A' || scan.metrics.grade === 'B' ? 'bg-success' : 'bg-warning' %>">
+                                    <%= scan.metrics.grade %>
+                                </span>
+                            </td>
+                            <td>
+                                <div class="table-score-cell">
+                                    <span><%= scan.metrics.score %>%</span>
+                                    <div class="tiny-bar-container">
+                                        <div class="tiny-bar bg-cyan" style="width: <%= scan.metrics.score %>%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="<%= scan.vulnerabilities.length > 0 ? 'text-rose font-bold' : 'text-success' %>">
+                                    <%= scan.vulnerabilities.length %> issues
+                                </span>
+                            </td>
+                            <td class="text-muted"><%= new Date(scan.timestamp).toLocaleString() %></td>
+                        </tr>
+                    <% }); %>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Loader for Scanning -->
+<div id="scan-modal" class="modal-backdrop hidden">
+    <div class="modal-content glass text-center">
+        <div class="spinner"></div>
+        <h4>Analyzing codebase...</h4>
+        <p class="text-muted">Performing static security and complexity checks across workspace directory.</p>
+    </div>
+</div>
+
+<!-- Inject Dashboard Script -->
+<script src="/js/dashboard.js"></script>
+
+<%- include('partials/footer') %>
