@@ -134,4 +134,15 @@ describe('Static Security Scanner Unit Tests', () => {
         expect(cryptoVuln).toBeDefined();
         expect(cryptoVuln.severity).toBe('MEDIUM');
     });
+
+    test('should detect Insecure CORS vulnerability', () => {
+        const vulnCode = `
+            app.use(cors({ origin: '*' }));
+        `;
+        const report = scanner.scanSnippet(vulnCode, 'cors.js');
+        expect(report.vulnerabilities.length).toBe(1);
+        const corsVuln = report.vulnerabilities.find(v => v.ruleId === 'INSECURE_CORS');
+        expect(corsVuln).toBeDefined();
+        expect(corsVuln.severity).toBe('HIGH');
+    });
 });
