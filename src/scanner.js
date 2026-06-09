@@ -95,6 +95,17 @@ const RULES = [
             }
             return false;
         }
+    },
+    {
+        id: 'NOSQL_INJECTION',
+        name: 'NoSQL Injection Vulnerability',
+        severity: 'HIGH',
+        description: 'Passing unsanitized user inputs directly into NoSQL query filters allows attackers to execute unauthorized commands or bypass authentication via query operators ($gt, $ne).',
+        remediation: 'Sanitize query parameters explicitly, cast inputs to string types (e.g. String(req.body.user)), or use a library like mongo-sanitize.',
+        test: (line) => {
+            return /\b\.(?:find|findOne|update|updateOne|updateMany|delete|deleteOne|deleteMany)\s*\(\s*\{.*?\b(req\.(?:query|params|body))\b/i.test(line) &&
+                   !/\b(?:sanitize|String)\b/i.test(line);
+        }
     }
 ];
 

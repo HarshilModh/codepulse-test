@@ -110,4 +110,17 @@ describe('Static Security Scanner Unit Tests', () => {
         expect(xssVuln).toBeDefined();
         expect(xssVuln.severity).toBe('HIGH');
     });
+
+    test('should detect NoSQL Injection vulnerability', () => {
+        const vulnCode = `
+            User.findOne({ username: req.body.username, password: req.body.password }, (err, user) => {
+                console.log(user);
+            });
+        `;
+        const report = scanner.scanSnippet(vulnCode, 'nosql.js');
+        expect(report.vulnerabilities.length).toBe(1);
+        const nosqlVuln = report.vulnerabilities.find(v => v.ruleId === 'NOSQL_INJECTION');
+        expect(nosqlVuln).toBeDefined();
+        expect(nosqlVuln.severity).toBe('HIGH');
+    });
 });
