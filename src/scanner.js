@@ -116,6 +116,17 @@ const RULES = [
         test: (line) => {
             return /\bcreateHash\s*\(\s*['"](?:md5|sha1)['"]\s*\)/i.test(line);
         }
+    },
+    {
+        id: 'DOM_XSS',
+        name: 'DOM-based Cross-Site Scripting (DOM XSS)',
+        severity: 'HIGH',
+        description: 'Writing user-controlled input directly to innerHTML without sanitization can allow attackers to execute arbitrary scripts in the context of the user\'s browser session.',
+        remediation: 'Use textContent or innerText instead of innerHTML to automatically escape inputs, or sanitize the HTML input using a library like DOMPurify.',
+        test: (line) => {
+            return /\.innerHTML\s*=\s*(?:[^)'"`\s]+|['"`].*?[\+\$].*?['"`])/i.test(line) &&
+                   !/\b(?:sanitize|escape|DOMPurify|textContent|innerText)\b/i.test(line);
+        }
     }
 ];
 
