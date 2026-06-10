@@ -148,6 +148,19 @@ const RULES = [
         test: (line) => {
             return /(mongodb(?:\+srv)?|postgres|mysql|sqlite):\/\/[a-zA-Z0-9_]+:[^@\s]+@[a-zA-Z0-9_\-\.]+/i.test(line);
         }
+    },
+    {
+        id: 'JWT_WEAK_SECRET',
+        name: 'Weak JWT Secret Key',
+        severity: 'HIGH',
+        description: 'Using a weak or short static secret key to sign JSON Web Tokens (JWT) allows attackers to brute-force the key and forge tokens.',
+        remediation: 'Use a cryptographically secure, long secret key loaded from environment variables (process.env) instead of short static strings.',
+        test: (line) => {
+            const match = /\bjwt\.sign\s*\(\s*[^,]+,\s*(['"].*?['"])\s*[,)]/i.exec(line);
+            if (!match) return false;
+            const keyVal = match[1].replace(/['"]/g, '').trim();
+            return keyVal.length < 16 || /^(?:secret|key|test|development|signature)$/i.test(keyVal);
+        }
     }
 ];
 
