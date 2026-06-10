@@ -156,4 +156,15 @@ describe('Static Security Scanner Unit Tests', () => {
         expect(tlsVuln).toBeDefined();
         expect(tlsVuln.severity).toBe('CRITICAL');
     });
+
+    test('should detect Insecure Deserialization vulnerability', () => {
+        const vulnCode = `
+            const obj = serialize.unserialize(data);
+        `;
+        const report = scanner.scanSnippet(vulnCode, 'deserialize.js');
+        expect(report.vulnerabilities.length).toBe(1);
+        const deserializeVuln = report.vulnerabilities.find(v => v.ruleId === 'INSECURE_DESERIALIZATION');
+        expect(deserializeVuln).toBeDefined();
+        expect(deserializeVuln.severity).toBe('CRITICAL');
+    });
 });

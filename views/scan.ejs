@@ -18,6 +18,7 @@
                     <option value="crypto">Weak Hashing Algorithm</option>
                     <option value="cors">Insecure CORS Configuration</option>
                     <option value="tls">Insecure TLS Verification</option>
+                    <option value="deserialize">Insecure Deserialization</option>
                     <option value="mixed">All Security Flaws (mixed)</option>
                 </select>
             </div>
@@ -206,6 +207,15 @@ const options = {
 const req = https.request(options, (res) => {
     console.log('Response status:', res.statusCode);
 });`,
+        deserialize: `// Critical: Insecure Deserialization
+const serialize = require('node-serialize');
+
+function handleSession(req, res) {
+    const sessionCookie = req.cookies.session;
+    // Vulnerable: parsing user object using unsafe node-serialize unserialize method
+    const sessionObj = serialize.unserialize(Buffer.from(sessionCookie, 'base64').toString());
+    res.send("Welcome back " + sessionObj.username);
+}`,
         mixed: `const fs = require('fs');
 const { execSync } = require('child_process');
 
