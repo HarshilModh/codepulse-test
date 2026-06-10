@@ -167,4 +167,15 @@ describe('Static Security Scanner Unit Tests', () => {
         expect(deserializeVuln).toBeDefined();
         expect(deserializeVuln.severity).toBe('CRITICAL');
     });
+
+    test('should detect JWT Decode Without Verification vulnerability', () => {
+        const vulnCode = `
+            const decoded = jwt.decode(token);
+        `;
+        const report = scanner.scanSnippet(vulnCode, 'jwt.js');
+        expect(report.vulnerabilities.length).toBe(1);
+        const jwtVuln = report.vulnerabilities.find(v => v.ruleId === 'JWT_DECODE_WITHOUT_VERIFY');
+        expect(jwtVuln).toBeDefined();
+        expect(jwtVuln.severity).toBe('CRITICAL');
+    });
 });

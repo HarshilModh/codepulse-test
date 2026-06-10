@@ -183,6 +183,16 @@ const RULES = [
             return /\b(?:serialize|unserialize)\b/i.test(line) &&
                    !/\b(?:JSON|serialize-javascript)\b/i.test(line);
         }
+    },
+    {
+        id: 'JWT_DECODE_WITHOUT_VERIFY',
+        name: 'JWT Decode Without Verification',
+        severity: 'CRITICAL',
+        description: 'Decoding a JSON Web Token (JWT) using jwt.decode() instead of verifying it retrieves the payload without validating the signature, exposing the application to token tampering and authorization bypass.',
+        remediation: 'Always use jwt.verify(token, secretKey) to check the token signature before trusting its contents.',
+        test: (line) => {
+            return /\bjwt\.decode\s*\(/i.test(line);
+        }
     }
 ];
 

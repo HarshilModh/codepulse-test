@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (presetVal === 'cors') filenameInput.value = 'cors-config.js';
                 else if (presetVal === 'tls') filenameInput.value = 'tls-check.js';
                 else if (presetVal === 'deserialize') filenameInput.value = 'session-handler.js';
+                else if (presetVal === 'jwt-decode') filenameInput.value = 'jwt-handler.js';
                 else filenameInput.value = 'vulnerable-server.js';
             }
         });
