@@ -172,6 +172,17 @@ const RULES = [
             return /NODE_TLS_REJECT_UNAUTHORIZED\s*=\s*['"]0['"]/i.test(line) ||
                    /rejectUnauthorized\s*:\s*false/i.test(line);
         }
+    },
+    {
+        id: 'INSECURE_DESERIALIZATION',
+        name: 'Insecure Deserialization',
+        severity: 'CRITICAL',
+        description: 'Deserializing untrusted data using unsafe methods or libraries can allow attackers to execute arbitrary JavaScript code on the server.',
+        remediation: 'Avoid unsafe serialization libraries like node-serialize. Use standard JSON.parse() and validate incoming objects against a schema.',
+        test: (line) => {
+            return /\b(?:serialize|unserialize)\b/i.test(line) &&
+                   !/\b(?:JSON|serialize-javascript)\b/i.test(line);
+        }
     }
 ];
 
