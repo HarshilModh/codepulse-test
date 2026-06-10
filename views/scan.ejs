@@ -19,6 +19,7 @@
                     <option value="cors">Insecure CORS Configuration</option>
                     <option value="tls">Insecure TLS Verification</option>
                     <option value="deserialize">Insecure Deserialization</option>
+                    <option value="jwt-decode">JWT Decode Without Verification</option>
                     <option value="mixed">All Security Flaws (mixed)</option>
                 </select>
             </div>
@@ -215,6 +216,22 @@ function handleSession(req, res) {
     // Vulnerable: parsing user object using unsafe node-serialize unserialize method
     const sessionObj = serialize.unserialize(Buffer.from(sessionCookie, 'base64').toString());
     res.send("Welcome back " + sessionObj.username);
+}`,
+        "jwt-decode": `// Critical: JWT Decode Without Verification
+const jwt = require('jsonwebtoken');
+
+function authenticateUser(req, res) {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1];
+    
+    // Vulnerable: decoding token retrieves user details without verifying signature
+    const userPayload = jwt.decode(token);
+    
+    if (userPayload && userPayload.role === 'admin') {
+        res.send("Admin Access Granted!");
+    } else {
+        res.status(403).send("Forbidden!");
+    }
 }`,
         mixed: `const fs = require('fs');
 const { execSync } = require('child_process');
