@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (presetVal === 'nosql') filenameInput.value = 'user-auth.js';
                 else if (presetVal === 'crypto') filenameInput.value = 'hasher.js';
                 else if (presetVal === 'cors') filenameInput.value = 'cors-config.js';
+                else if (presetVal === 'tls') filenameInput.value = 'tls-check.js';
                 else filenameInput.value = 'vulnerable-server.js';
             }
         });

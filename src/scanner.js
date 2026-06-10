@@ -161,6 +161,17 @@ const RULES = [
             const keyVal = match[1].replace(/['"]/g, '').trim();
             return keyVal.length < 16 || /^(?:secret|key|test|development|signature)$/i.test(keyVal);
         }
+    },
+    {
+        id: 'INSECURE_TLS',
+        name: 'Insecure TLS/SSL Verification',
+        severity: 'CRITICAL',
+        description: 'Disabling TLS/SSL certificate verification allows attackers to intercept and modify communications via Man-in-the-Middle (MitM) attacks.',
+        remediation: 'Do not set rejectUnauthorized to false or disable NODE_TLS_REJECT_UNAUTHORIZED in production configurations.',
+        test: (line) => {
+            return /NODE_TLS_REJECT_UNAUTHORIZED\s*=\s*['"]0['"]/i.test(line) ||
+                   /rejectUnauthorized\s*:\s*false/i.test(line);
+        }
     }
 ];
 

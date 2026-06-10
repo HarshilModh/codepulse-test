@@ -145,4 +145,15 @@ describe('Static Security Scanner Unit Tests', () => {
         expect(corsVuln).toBeDefined();
         expect(corsVuln.severity).toBe('HIGH');
     });
+
+    test('should detect Insecure TLS/SSL verification', () => {
+        const vulnCode = `
+            process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+        `;
+        const report = scanner.scanSnippet(vulnCode, 'tls.js');
+        expect(report.vulnerabilities.length).toBe(1);
+        const tlsVuln = report.vulnerabilities.find(v => v.ruleId === 'INSECURE_TLS');
+        expect(tlsVuln).toBeDefined();
+        expect(tlsVuln.severity).toBe('CRITICAL');
+    });
 });
