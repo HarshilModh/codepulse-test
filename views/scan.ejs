@@ -17,6 +17,7 @@
                     <option value="nosql">NoSQL Injection Vulnerability</option>
                     <option value="crypto">Weak Hashing Algorithm</option>
                     <option value="cors">Insecure CORS Configuration</option>
+                    <option value="tls">Insecure TLS Verification</option>
                     <option value="mixed">All Security Flaws (mixed)</option>
                 </select>
             </div>
@@ -187,6 +188,23 @@ app.use(cors({ origin: '*' }));
 app.get('/data', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.json({ secret: 'user_sensitive_data' });
+});`,
+        tls: `// Critical: Disabling TLS/SSL verification
+const https = require('https');
+
+// Vulnerable: disabling security checks makes the app vulnerable to MitM
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+const options = {
+    hostname: 'api.internal',
+    port: 443,
+    path: '/data',
+    method: 'GET',
+    rejectUnauthorized: false
+};
+
+const req = https.request(options, (res) => {
+    console.log('Response status:', res.statusCode);
 });`,
         mixed: `const fs = require('fs');
 const { execSync } = require('child_process');
